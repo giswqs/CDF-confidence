@@ -76,7 +76,7 @@ import numpy as np
 # Plot empirical CDF with confidence intervals.
 #   num_quantile_regions=100 means estimate confidence interval at 1%,2%,3%,...,99%.
 #   confidence=0.90 mean plot the confidence interval range [5%-95%]
-def plot_CDF_confidence(data,num_quantile_regions='all',confidence=0.90,plot_ecdf=True,
+def plot_CDF_confidence(data,num_quantile_regions=100,confidence=0.90,plot_ecdf=True,
 	data_already_sorted=False,color='green',label='',alpha=0.3,estimator_name='beta',
 	ax='use default axes'):
 	data=np.array(data)
@@ -115,6 +115,11 @@ def plot_CDF_confidence(data,num_quantile_regions='all',confidence=0.90,plot_ecd
 	else:
 		raise NameError('Unknown error estimator name %s'%(estimator_name))
 
+	low =np.zeros(np.shape(quantile_list))
+	high=np.zeros(np.shape(quantile_list))
+	emp_quantile_list=np.linspace(1.0/float(len(data)+1),1.0-(1.0/float(len(data)+1)),num=len(data))
+
+
 	if estimator_type=='quantile':
 		if num_quantile_regions==len(data)+1:
 			interpolated_quantile_list=data
@@ -122,9 +127,7 @@ def plot_CDF_confidence(data,num_quantile_regions='all',confidence=0.90,plot_ecd
 			invCDF_interp=interpolate.interp1d(emp_quantile_list, data)
 			interpolated_quantile_list=invCDF_interp(quantile_list)
 
-	low =np.zeros(np.shape(quantile_list))
-	high=np.zeros(np.shape(quantile_list))
-	emp_quantile_list=np.linspace(1.0/float(len(data)+1),1.0-(1.0/float(len(data)+1)),num=len(data))
+
 	if estimator_type=='quantile':
 		for i,q in enumerate(quantile_list):
 			low[i] =CDF_error_function(len(data),q, low_conf)
